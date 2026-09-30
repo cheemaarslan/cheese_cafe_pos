@@ -1,0 +1,233 @@
+<template>
+    <LoadingComponent :props="loading" />
+    <section class="pt-8 pb-16">
+        <div class="container max-w-[360px] py-6 p-4 mb-6 sm:px-6 shadow-xs rounded-2xl bg-white">
+            <h2 class="capitalize mb-6 text-center text-[22px] font-semibold leading-[34px] text-heading">
+                {{ $t('label.welcome_back') }}
+            </h2>
+            <div v-if="errors.validation"
+                class="bg-red-100 border border-red-400 text-red-700 px-3 py-3 mb-5 rounded relative flex items-start gap-2"
+                role="alert">
+                <span class="block sm:inline text-sm flex-auto">{{ errors.validation }}</span>
+                <button type="button" @click="close" class="leading-none">
+                    <i class="lab lab-close-circle-line"></i>
+                </button>
+            </div>
+            <form @submit.prevent="login">
+                <div class="mb-4">
+                    <label for="formEmail" class="text-sm capitalize mb-1 text-heading">{{ $t('label.email') }}</label>
+                    <input type="text" :class="errors.email ? 'invalid' : ''" v-model="form.email"
+                        class="w-full h-12 rounded-lg border px-4 border-[#D9DBE9]" id="formEmail">
+                    <small class="db-field-alert" v-if="errors.email">{{ errors.email[0] }}</small>
+                </div>
+                <div class="mb-4">
+                    <label for="formPassword" class="text-sm capitalize mb-1 text-heading">{{
+                        $t('label.password')
+                        }}</label>
+                    <input autocomplete="off" type="password" :class="errors.password ? 'invalid' : ''"
+                        v-model="form.password" class="w-full h-12 rounded-lg border px-4 border-[#D9DBE9]"
+                        id="formPassword">
+                    <small class="db-field-alert" v-if="errors.password">{{ errors.password[0] }}</small>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="db-field-checkbox p-0">
+                        <div class="custom-checkbox w-3 h-3">
+                            <input type="checkbox" id="checkbox2" class="custom-checkbox-field">
+                            <i
+                                class="fa-solid fa-check custom-checkbox-icon leading-[9px] text-[9px] rounded-[3px] border-[#6E7191]"></i>
+                        </div>
+                        <label for="checkbox2" class="db-field-label text-xs text-heading">
+                            {{ $t('label.remember_me') }}
+                        </label>
+                    </div>
+                    <router-link :to="{ name: 'auth.forgetPassword' }"
+                        class="capitalize text-xs font-medium transition text-primary">
+                        {{ $t('button.forget_password') }}
+                    </router-link>
+                </div>
+                <button type="submit"
+                    class="w-full h-12 text-center capitalize font-medium rounded-3xl mb-6 text-white bg-primary">
+                    {{ $t('button.login') }}
+                </button>
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <span class="text-xs text-[#6E7191]">{{ $t('message.have_account') }}</span>
+                    <router-link :to="{ name: 'auth.signupPhone' }" class="text-xs font-medium text-primary">
+                        {{ $t('button.signup') }}
+                    </router-link>
+                </div>
+
+                <div v-if="enums.activityEnum.ENABLE == setting.site_guest_login || setting.is_google_auth_enable === '1' || setting.is_google_auth_enable === 'true' || setting.is_google_auth_enable === true || setting.is_google_auth_enable === 1">
+                    <p class="text-sm uppercase text-center mb-3 text-[#6E7191]">{{ $t('label.or') }}</p>
+                    
+                    <div class="flex flex-col gap-3">
+                        <router-link v-if="enums.activityEnum.ENABLE == setting.site_guest_login" :to="{ name: 'auth.guestLogin' }"
+                            class="w-full h-12 leading-[46px] text-center capitalize font-medium rounded-3xl border text-primary border-primary bg-white">
+                            {{ $t('button.login_as_guest') }}
+                        </router-link>
+
+                        <button v-if="setting.is_google_auth_enable === '1' || setting.is_google_auth_enable === 'true' || setting.is_google_auth_enable === true || setting.is_google_auth_enable === 1" 
+                            @click.prevent="continueWithGoogle" type="button"
+                            class="w-full h-12 flex items-center justify-center gap-2 capitalize font-medium rounded-3xl border text-[#757575] border-[#E0E0E0] bg-white hover:bg-gray-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+                            Continue with Google
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div v-if="demo === 'true' || demo === 'TRUE' || demo === 'True' || demo === '1' || demo === 1"
+            class="container max-w-[360px] py-6 p-4 sm:px-6 shadow-xs rounded-2xl bg-white">
+            <h2 class="mb-6 text-center text-lg font-medium text-heading">{{ $t('message.for_quick_demo') }}</h2>
+            <nav class="grid grid-cols-2 gap-3">
+                <button @click.prevent="setupCredit('admin')"
+                    class="click-to-prop w-full h-10 leading-10 rounded-lg text-center text-sm capitalize text-white bg-orange-500"
+                    id="adminClick">
+                    {{ $t('label.admin') }}
+                </button>
+                <button @click.prevent="setupCredit('customer')"
+                    class="click-to-prop w-full h-10 leading-10 rounded-lg text-center text-sm capitalize text-white bg-emerald-500"
+                    id="customerClick">
+                    {{ $t('label.customer') }}
+                </button>
+                <button @click.prevent="setupCredit('branchManager')"
+                    class="click-to-prop w-full h-10 leading-10 rounded-lg text-center text-sm capitalize text-white bg-sky-600"
+                    id="branchManagerClick">
+                    {{ $t('label.branch_manager') }}
+                </button>
+                <button @click.prevent="setupCredit('posOperator')"
+                    class="click-to-prop w-full h-10 leading-10 rounded-lg text-center text-sm capitalize text-white bg-purple-500"
+                    id="posOperatorClick">
+                    {{ $t('label.pos_operator') }}
+                </button>
+                <button @click.prevent="setupCredit('chef')"
+                    class="click-to-prop w-full h-10 leading-10 rounded-lg text-center text-sm capitalize text-white bg-blue-500"
+                    id="chefClick">
+                    {{ $t('label.chef_kitchen') }}
+                </button>
+            </nav>
+        </div>
+        
+        <RecaptchaModalComponent ref="recaptchaModal" @verified="onRecaptchaVerified" />
+    </section>
+</template>
+
+<script>
+import router from "../../../router";
+import LoadingComponent from "../components/LoadingComponent";
+import alertService from "../../../services/alertService";
+import appService from "../../../services/appService";
+import ENV from "../../../config/env";
+import activityEnum from "../../../enums/modules/activityEnum";
+import { routes } from "../../../router";
+import RecaptchaModalComponent from "../components/RecaptchaModalComponent";
+
+export default {
+    name: "LoginComponent",
+    components: { LoadingComponent, RecaptchaModalComponent },
+    data() {
+        return {
+            loading: {
+                isActive: false,
+            },
+            form: {
+                email: "",
+                password: "",
+                recaptcha_token: "",
+            },
+            errors: {},
+            permissions: {},
+            firstMenu: null,
+            demo: ENV.DEMO,
+            enums: {
+                activityEnum: activityEnum
+            }
+        }
+    },
+    mounted() {
+        if (this.$route.query.error === 'google_auth_failed') {
+            alertService.error("Google authentication failed. Please try again.");
+            this.$router.replace({ query: null });
+        }
+    },
+    computed: {
+        carts: function () {
+            return this.$store.getters['frontendCart/lists'];
+        },
+        setting: function () {
+            return this.$store.getters['frontendSetting/lists']
+        },
+        permission: function () {
+            return this.$store.getters.authPermission;
+        },
+    },
+    methods: {
+        continueWithGoogle: function () {
+            window.location.href = '/api/auth/google';
+        },
+        login: function () {
+            if (this.setting.is_google_recaptcha_enable) {
+                this.$refs.recaptchaModal.open();
+            } else {
+                this.executeLogin();
+            }
+        },
+        onRecaptchaVerified(token) {
+            this.form.recaptcha_token = token;
+            this.executeLogin();
+        },
+        executeLogin: function () {
+            try {
+                this.loading.isActive = true;
+                this.$store.dispatch('login', this.form).then((res) => {
+                    this.loading.isActive = false;
+
+                    if (res && res.data.role && (res.data.role.name === 'Chef' || res.data.role.name === 'Admin')) {
+                        this.$store.dispatch('logout').then(() => {
+                            alertService.error(this.$t('message.invalid_credentials'));
+                        });
+                        return;
+                    }
+
+                    alertService.success(res.data.message);
+
+                    if (this.carts.length > 0) {
+                        router.push({ name: "frontend.checkout" });
+                    } else {
+                        router.push({ name: "frontend.home" });
+                    }
+                    setTimeout(() => {
+                        appService.recursiveRouter(routes, this.permission);
+                    }, 1000);
+                }).catch((err) => {
+                    this.loading.isActive = false;
+                    this.errors = err.response.data.errors;
+                })
+            } catch (err) {
+                this.loading.isActive = false;
+            }
+        },
+        close: function () {
+            this.errors = {}
+        },
+        setupCredit: function (e) {
+            if (e === 'admin') {
+                this.form.email = 'admin@example.com';
+                this.form.password = '123456';
+            } else if (e === 'customer') {
+                this.form.email = 'customer@example.com';
+                this.form.password = '123456';
+            } else if (e === 'branchManager') {
+                this.form.email = 'branchmanager@example.com';
+                this.form.password = '123456';
+            } else if (e === 'posOperator') {
+                this.form.email = 'posoperator@example.com';
+                this.form.password = '123456';
+            } else if (e === 'chef') {
+                this.form.email = 'chef@example.com';
+                this.form.password = '123456';
+            }
+        }
+    }
+}
+</script>

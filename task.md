@@ -1,0 +1,24 @@
+# Cart Migration Tasks
+
+- `[ ]` **Backend: Database & Models**
+    - `[ ]` Create migration for `carts` table
+    - `[ ]` Create migration for `cart_items` table
+    - `[ ]` Create `Cart` model with Eloquent relationships
+    - `[ ]` Create `CartItem` model with Eloquent relationships
+- `[ ]` **Backend: Controllers & API Routes**
+    - `[ ]` Create `Frontend/CartController`
+    - `[ ]` Implement `index` (fetch cart) method
+    - `[ ]` Implement `add` (add item/update quantity) method
+    - `[ ]` Implement `remove` and `clear` methods
+    - `[ ]` Implement `applyCoupon` and `updateOrderType` methods
+    - `[ ]` Define Cart API routes in `routes/api.php`
+    - `[ ]` Update authentication (e.g. `LoginController`) to merge/assign guest carts on login
+- `[ ]` **Frontend: Vuex & Session Integration**
+    - `[ ]` Set up `cart_session_id` generation and persistence (cookie/localStorage) for guest tracking
+    - `[ ]` Refactor `resources/js/store/modules/frontend/frontendCart.js` to dispatch Axios requests
+    - `[ ]` Update `app.js` to fetch initial cart DB state on page load
+- `[ ]` **Verification & Testing**
+    - `[ ]` Test guest cart flow (adding items, refresh page)
+    - `[ ]` Test guest cart transfer after user login
+    - `[ ]` Test authenticated user cart flow
+    - `[ ]` Verify variation and extra calculation logic is intact
