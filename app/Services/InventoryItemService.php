@@ -6,7 +6,10 @@ use App\Http\Requests\InventoryItemRequest;
 use App\Http\Requests\PaginateRequest;
 use App\Libraries\QueryExceptionLibrary;
 use App\Models\InventoryItem;
+use App\Models\InventoryPurchase;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class InventoryItemService
@@ -62,7 +65,12 @@ class InventoryItemService
     public function store(InventoryItemRequest $request): InventoryItem
     {
         try {
-            return InventoryItem::create($request->validated());
+            return DB::transaction(function () use ($request) {
+                $inventoryItem = InventoryItem::create($request->validated());
+                $this->recordPurchase($inventoryItem, (float) $inventoryItem->quantity);
+
+                return $inventoryItem;
+            });
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
@@ -72,13 +80,40 @@ class InventoryItemService
     public function update(InventoryItemRequest $request, InventoryItem $inventoryItem): InventoryItem
     {
         try {
-            $inventoryItem->update($request->validated());
+            return DB::transaction(function () use ($request, $inventoryItem) {
+                $previousQuantity = (float) $inventoryItem->quantity;
+                $inventoryItem->update($request->validated());
 
-            return $inventoryItem->refresh();
+                // Only an increase is new stock bought; a decrease is stock being used up.
+                $this->recordPurchase($inventoryItem, round((float) $inventoryItem->quantity - $previousQuantity, 3));
+
+                return $inventoryItem->refresh();
+            });
         } catch (Exception $exception) {
             Log::error($exception->getMessage());
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
         }
+    }
+
+    /**
+     * Log newly bought stock so the Profit & Loss report counts its cost as an expense.
+     */
+    private function recordPurchase(InventoryItem $inventoryItem, float $quantity): void
+    {
+        if ($quantity <= 0) {
+            return;
+        }
+
+        $unitCost = (float) ($inventoryItem->unit_cost ?? 0);
+
+        InventoryPurchase::create([
+            'inventory_item_id' => $inventoryItem->id,
+            'quantity' => $quantity,
+            'unit_cost' => $unitCost,
+            'total_cost' => round($quantity * $unitCost, 6),
+            'purchase_date' => now()->toDateString(),
+            'created_by' => Auth::id(),
+        ]);
     }
 
     public function destroy(InventoryItem $inventoryItem): void

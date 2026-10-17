@@ -375,13 +375,22 @@
 
 /* POS code start */
 .pos-card-height {
-    min-height: 250px !important;
-    height: auto !important;
+    height: 300px !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .pos-image-height {
-    height: 170px !important;
-    object-fit: cover;
+    height: 68% !important;
+    flex-shrink: 0 !important;
+}
+
+.pos-card-height > div {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
 }
 
 .pos-add-button:hover .font-fill-primary {

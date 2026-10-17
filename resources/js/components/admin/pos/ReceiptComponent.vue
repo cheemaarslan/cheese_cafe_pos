@@ -19,8 +19,8 @@
             </div>
             <div class="modal-body" ref="receiptBody">
                 <div class="text-center pb-3.5 border-b border-dashed border-gray-400">
-                    <img v-if="setting.theme_logo" :src="'/receipt-logo?v=' + encodeURIComponent(setting.theme_logo)" alt=""
-                        class="max-w-[200px] max-h-[130px] mx-auto mb-2">
+                    <img v-if="setting.theme_logo" :src="'/receipt-logo?v=' + encodeURIComponent(setting.theme_logo)"
+                        alt="" class="max-w-[200px] max-h-[130px] mx-auto mb-2">
                     <h3 class="text-2xl font-bold mb-1">{{ company.company_name }}</h3>
                     <h4 class="text-sm font-normal">{{ branch.address }}</h4>
                     <h5 class="text-sm font-normal">Tel: {{ branch.phone }}</h5>

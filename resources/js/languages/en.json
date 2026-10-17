@@ -97,14 +97,16 @@
         "google_recaptcha": "Google reCAPTCHA",
         "sidebar_menu": "Sidebar Menu",
         "settings_tabs": "Settings Tabs",
-        "inventory": "Inventory"
+        "inventory": "Inventory",
+        "expenses": "Expenses",
+        "profit_loss": "Profit & Loss"
     },
     "label": {
         "previous": "Previous",
         "extra_items": "Extra Items",
         "editing_order": "Editing Order",
         "next": "Next",
-        "search":"Search",
+        "search": "Search",
         "default": "Default",
         "action": "Action",
         "id": "Id",
@@ -690,7 +692,7 @@
         "blog_description": "Discover tasty recipes, food tips, and updates from our restaurant.",
         "ourSpecials": "Our Specials",
         "complete_offer": "Complete Offer",
-        "includes" : "Includes",
+        "includes": "Includes",
         "all_items": "All Items",
         "online_payment": "Online Payment",
         "min_order_price": "Min Order Price",
@@ -698,7 +700,7 @@
         "order_subtotal": "Order Subtotal",
         "earned_at": "Earned At",
         "points": "Points",
-        "noOrders" : "No Orders Yet",
+        "noOrders": "No Orders Yet",
         "order": "Order",
         "total_balance": "Total Balance",
         "view_history": "View History",
@@ -707,7 +709,26 @@
         "seen": "Seen",
         "unseen": "Unseen",
         "SEEN": "Seen",
-        "UNSEEN": "Unseen"
+        "UNSEEN": "Unseen",
+        "income": "Income",
+        "inventory_purchases": "Inventory Purchases",
+        "other_expenses": "Other Expenses",
+        "net_profit": "Net Profit",
+        "net_loss": "Net Loss",
+        "total_expenses": "Total Expenses",
+        "monthly_breakdown": "Monthly Breakdown",
+        "daily_breakdown": "Daily Breakdown",
+        "expenses_by_category": "Expenses by Category",
+        "uncategorized": "Uncategorized",
+        "preset_today": "Today",
+        "this_month": "This Month",
+        "last_month": "Last Month",
+        "this_year": "This Year",
+        "confirmed_orders_count": "{count} confirmed orders",
+        "expense_rent": "Rent",
+        "expense_salary": "Salary",
+        "expense_utilities": "Utilities",
+        "expense_maintenance": "Maintenance"
     },
     "button": {
         "add": "Add",
@@ -819,14 +840,17 @@
         "back_to_blog": "Back to Blog",
         "search_products": "Search Items",
         "add_offer_to_cart": "Add Offer to Cart",
-        "loyalty_points" : "Loyalty Points",
-        "mark_all_read" : "Mark All as Read",
+        "loyalty_points": "Loyalty Points",
+        "mark_all_read": "Mark All as Read",
         "loading": "Loading...",
-        "back": "Back"
+        "back": "Back",
+        "add_expense": "Add Expense"
     },
     "placeholder": {
         "inventory_category": "e.g. Beverages, Bakery, Ingredients",
-        "inventory_unit": "e.g. bottle, loaf, kg, litre"
+        "inventory_unit": "e.g. bottle, loaf, kg, litre",
+        "expense_title": "e.g. Shop rent for October",
+        "expense_category": "e.g. Rent, Salary, Utilities"
     },
     "number": {
         "10": "10",
@@ -908,7 +932,7 @@
         "get_all_items_with_discount": "Get all items with discount",
         "pay_at_delivery": "You can pay at delivery time.",
         "secure_payment": "Secure Payment",
-        "select_address_required" : "Please select address.",
+        "select_address_required": "Please select address.",
         "offer_added_to_cart": "Offer added to cart successfully.",
         "no_notifications": "No notifications available.",
         "loading": "Loading...",
@@ -929,6 +953,8 @@
         "whatsapp_thanks_body": "We hope you enjoyed every bite. It was a pleasure serving you, and we look forward to welcoming you back soon.",
         "whatsapp_invoice_title": "Invoice #{serial}",
         "whatsapp_invoice_total": "Total: {total}",
-        "whatsapp_invoice_download": "View or download your invoice:"
+        "whatsapp_invoice_download": "View or download your invoice:",
+        "profit_loss_formula": "Income from confirmed orders minus inventory purchases and other expenses.",
+        "inventory_purchase_hint": "Stock is counted as a purchase when an item is added or its quantity is increased. Deleting a wrong entry here removes it from the expenses only; the stock quantity is not changed."
     }
 }

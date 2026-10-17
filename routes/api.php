@@ -31,6 +31,8 @@ use App\Http\Controllers\Admin\ItemAttributeController;
 use App\Http\Controllers\Admin\ItemCategoryController;
 use App\Http\Controllers\Admin\ItemController;
 use App\Http\Controllers\Admin\InventoryItemController;
+use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\ProfitLossController;
 use App\Http\Controllers\Admin\ItemExtraController;
 use App\Http\Controllers\Admin\ItemsReportController;
 use App\Http\Controllers\Admin\ItemVariationController;
@@ -157,6 +159,8 @@ Route::prefix('auth')->middleware(['installed', 'apiKey', 'localization'])->name
     });
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/menu', [LoginController::class, 'menu']);
+
         Route::middleware('verify.api')->group(function () {
             Route::post('/logout', [LoginController::class, 'logout']);
             Route::post('/kiosk-logout', [KioskMachineLoginController::class, 'logout']);
@@ -622,6 +626,19 @@ Route::prefix('admin')->name('admin.')->middleware(['installed', 'apiKey', 'loca
         Route::post('/', [InventoryItemController::class, 'store']);
         Route::match(['post', 'put', 'patch'], '/{inventoryItem}', [InventoryItemController::class, 'update']);
         Route::delete('/{inventoryItem}', [InventoryItemController::class, 'destroy']);
+    });
+
+    Route::prefix('expense')->name('expense.')->group(function () {
+        Route::get('/', [ExpenseController::class, 'index']);
+        Route::get('/show/{expense}', [ExpenseController::class, 'show']);
+        Route::post('/', [ExpenseController::class, 'store']);
+        Route::match(['post', 'put', 'patch'], '/{expense}', [ExpenseController::class, 'update']);
+        Route::delete('/{expense}', [ExpenseController::class, 'destroy']);
+    });
+
+    Route::prefix('profit-loss')->name('profit-loss.')->group(function () {
+        Route::get('/', [ProfitLossController::class, 'index']);
+        Route::delete('/inventory-purchase/{inventoryPurchase}', [ProfitLossController::class, 'destroyPurchase']);
     });
 
     Route::prefix('pos')->name('pos.')->group(function () {

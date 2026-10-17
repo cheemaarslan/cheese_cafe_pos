@@ -25,7 +25,7 @@
         </div>
 
         <div class="swiper pos-menu-swiper mb-6" v-if="categories.length > 1">
-            <button type="button" v-show="!categoryAtStart" @click="scrollCategories(-1)"
+            <button v-show="!categoryAtStart" type="button" @click="scrollCategories(-1)"
                 class="absolute z-10 top-1/2 -translate-y-1/2 left-1 w-8 h-8 rounded-full bg-white shadow-md text-heading hover:text-primary transition">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
             </button>
@@ -47,7 +47,7 @@
                     </router-link>
                 </SwiperSlide>
             </Swiper>
-            <button type="button" v-show="!categoryAtEnd" @click="scrollCategories(1)"
+            <button v-show="!categoryAtEnd" type="button" @click="scrollCategories(1)"
                 class="absolute z-10 top-1/2 -translate-y-1/2 right-1 w-8 h-8 rounded-full bg-white shadow-md text-heading hover:text-primary transition">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
@@ -271,9 +271,7 @@
         <div class="p-4">
             <div class="mb-4">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium font-rubik capitalize text-[#2E2F38]">
-                        {{ $t('label.extra_items') }}
-                    </span>
+                    <span class="text-sm font-medium font-rubik capitalize text-[#2E2F38]">{{ $t('label.extra_items') }}</span>
                     <button @click.prevent="addExtraItemRow" type="button" :title="$t('button.add_more')"
                         class="fa-solid fa-plus text-[10px] w-[22px] h-[22px] text-center rounded-full border transition text-primary border-primary hover:bg-primary hover:text-white"></button>
                 </div>
@@ -281,8 +279,7 @@
                     <input v-model="extraItem.name" type="text" :placeholder="$t('label.name')"
                         class="flex-1 min-w-0 h-full rounded border px-3 text-sm border-[#EFF0F6]">
                     <input v-on:keypress="floatNumber($event)" v-model="extraItem.price" type="text"
-                        :placeholder="$t('label.price')"
-                        class="w-20 h-full rounded border px-3 text-sm border-[#EFF0F6]">
+                        :placeholder="$t('label.price')" class="w-20 h-full rounded border px-3 text-sm border-[#EFF0F6]">
                     <button v-if="extraItems.length > 1" @click.prevent="removeExtraItemRow(index)" type="button"
                         class="flex-shrink-0">
                         <i class="lab lab-trash-line-2 font-fill-danger"></i>
@@ -293,7 +290,6 @@
                     {{ $t('button.add') }}
                 </button>
             </div>
-
             <div class="flex h-[38px]" v-if="carts.length > 0">
                 <div class="dropdown-group">
                     <button
@@ -346,8 +342,8 @@
                         class="flex items-center gap-1.5 h-8 px-2 rounded-lg border border-dashed border-[#008BBA] bg-[#008BBA]/5 cursor-text transition focus-within:border-solid focus-within:bg-white focus-within:ring-1 focus-within:ring-[#008BBA]">
                         <i class="lab lab-edit-line lab-font-size-14 text-[#008BBA]"></i>
                         <input v-on:keypress="floatNumber($event)" v-model="deliveryChargeInput"
-                            @input="applyDeliveryCharge" @blur="normalizeDeliveryCharge" type="text"
-                            id="deliveryCharge" placeholder="0"
+                            @input="applyDeliveryCharge" @blur="normalizeDeliveryCharge" type="text" id="deliveryCharge"
+                            placeholder="0"
                             class="w-16 bg-transparent text-sm text-end font-rubik font-medium text-[#1AB759] focus:outline-none">
                     </label>
                 </li>
@@ -498,7 +494,7 @@ import alertService from "../../../services/alertService";
 import PaymentComponent from "./PaymentComponent";
 import ReceiptComponent from "./ReceiptComponent";
 import posPaymentMethodEnum from "../../../enums/modules/posPaymentMethodEnum";
-import { markRaw } from 'vue';
+import { markRaw } from "vue";
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { FreeMode, Mousewheel } from 'swiper/modules';
 import 'swiper/css';
@@ -525,14 +521,15 @@ export default {
             },
             order: {},
             lastOrder: {},
+            // Set while an existing order (?edit=<id>) is loaded into the cart.
             editOrder: null,
             categorySwiperModules: [FreeMode, Mousewheel],
             categorySwiper: null,
             categoryAtStart: true,
             categoryAtEnd: true,
             discount: null,
-            extraItems: [{ name: '', price: '' }],
-            deliveryChargeInput: '',
+            extraItems: [{ name: "", price: "" }],
+            deliveryChargeInput: "",
             deliveryChargeEdited: false,
             temp: {
                 instruction: '',
@@ -560,7 +557,6 @@ export default {
                     pos_received_amount: null,
 
                 },
-                // Set while an existing order is loaded into the cart, so checkout updates it instead of placing a new one
                 editOrderId: null,
             },
             props: {
@@ -720,6 +716,7 @@ export default {
                 status: statusEnum.ACTIVE,
                 excepts: `${roleEnum.ADMIN}|${roleEnum.CHEF}|${roleEnum.DELIVERY_BOY}`,
             }).then((res) => {
+                // An order being edited keeps its own customer.
                 if (!this.checkoutProps.editOrderId) {
                     this.checkoutProps.form.customer_id = res.data.data[1].id;
                     this.address.form.user_id = res.data.data[1].id;
@@ -826,6 +823,7 @@ export default {
             this.props.search.item_category_id = "";
             this.itemList();
         },
+        // Show/hide the scroll arrows depending on where the category strip is.
         updateCategoryEdges: function (swiper) {
             this.categorySwiper = markRaw(swiper);
             this.categoryAtStart = swiper.isBeginning;
@@ -833,11 +831,10 @@ export default {
         },
         scrollCategories: function (direction) {
             const swiper = this.categorySwiper;
-            if (!swiper) {
-                return;
+            if (swiper) {
+                const index = Math.max(0, Math.min(swiper.activeIndex + direction * 3, swiper.slides.length - 1));
+                swiper.slideTo(index);
             }
-            const target = Math.max(0, Math.min(swiper.activeIndex + direction * 3, swiper.slides.length - 1));
-            swiper.slideTo(target);
         },
         closeSidebar: function () {
             this.$store.dispatch("globalState/set", { topSidebar: false });
@@ -881,29 +878,29 @@ export default {
             this.$store.dispatch('posCart/deleteCartItem', { id: id, status: "decrement" }).then().catch();
         },
         addExtraItemRow: function () {
-            this.extraItems.push({ name: '', price: '' });
+            this.extraItems.push({ name: "", price: "" });
         },
         removeExtraItemRow: function (index) {
             this.extraItems.splice(index, 1);
         },
+        // Items typed in at the till (not on the menu) go into the cart as their own custom lines.
         addExtraItems: function () {
-            const rows = this.extraItems.filter(row => row.name.trim() !== '' || row.price !== '');
+            const rows = this.extraItems.filter((row) => row.name.trim() !== "" || row.price !== "");
             if (rows.length === 0) {
-                return alertService.error(this.$t('message.extra_item_required'));
+                return alertService.error(this.$t("message.extra_item_required"));
             }
-            // The price is optional: free items (e.g. a complimentary drink) go in at 0.
-            if (rows.some(row => row.name.trim() === '' || parseFloat(row.price) < 0)) {
-                return alertService.error(this.$t('message.extra_item_invalid'));
+            if (rows.some((row) => row.name.trim() === "" || parseFloat(row.price) < 0)) {
+                return alertService.error(this.$t("message.extra_item_invalid"));
             }
 
-            this.$store.dispatch('posCart/lists', rows.map(row => {
+            this.$store.dispatch("posCart/lists", rows.map((row) => {
                 const price = parseFloat(row.price) || 0;
                 return {
                     is_custom: true,
                     item_id: null,
                     name: row.name.trim(),
                     image: null,
-                    instruction: '',
+                    instruction: "",
                     discount: 0,
                     quantity: 1,
                     convert_price: price,
@@ -914,8 +911,7 @@ export default {
                     item_extras: { extras: [], names: [] },
                 };
             })).then().catch();
-
-            this.extraItems = [{ name: '', price: '' }];
+            this.extraItems = [{ name: "", price: "" }];
         },
         generateToken: function () {
             axios.get('/admin/pos/token').then(res => {
@@ -954,25 +950,25 @@ export default {
                 this.generateToken();
             }).catch();
         },
-        startEdit: function (id) {
-            this.checkoutProps.editOrderId = id;
+        // Load an existing order (POS orders list -> Edit, i.e. ?edit=<id>) into the cart.
+        startEdit: function (orderId) {
+            this.checkoutProps.editOrderId = orderId;
             this.loading.isActive = true;
-            this.$store.dispatch('posOrder/edit', id).then((res) => {
+            this.$store.dispatch("posOrder/edit", orderId).then((res) => {
                 this.loading.isActive = false;
                 this.applyEditOrder(res.data.data);
             }).catch((err) => {
                 this.loading.isActive = false;
-                alertService.error(err.response?.data?.message ?? this.$t('message.no_data_available'));
+                alertService.error(err.response?.data?.message ?? this.$t("message.no_data_available"));
                 this.resetCart();
             });
         },
-        // Loads a saved order back into the cart in the same shape ItemComponent adds items in
         applyEditOrder: function (order) {
             this.editOrder = { id: order.id, order_serial_no: order.order_serial_no };
             this.checkoutProps.editOrderId = order.id;
 
-            this.$store.dispatch('posCart/resetCart').then().catch();
-            this.$store.dispatch('posCart/lists', order.order_items.map(item => {
+            this.$store.dispatch("posCart/resetCart").then().catch();
+            this.$store.dispatch("posCart/lists", order.order_items.map((item) => {
                 const variations = {};
                 const variationNames = {};
                 _.forEach(item.item_variations, (variation) => {
@@ -992,7 +988,7 @@ export default {
                     item_id: item.item_id,
                     name: item.name,
                     image: item.image,
-                    instruction: item.instruction ?? '',
+                    instruction: item.instruction ?? "",
                     discount: item.discount,
                     quantity: item.quantity,
                     convert_price: item.price,
@@ -1007,22 +1003,22 @@ export default {
             this.discountType = discountTypeEnum.FIXED;
             this.discount = order.discount > 0 ? order.discount : null;
             this.checkoutProps.form.discount = order.discount;
-            this.$store.dispatch('posCart/discount', order.discount).then().catch();
+            this.$store.dispatch("posCart/discount", order.discount).then().catch();
 
             this.checkoutProps.form.token = order.token;
             this.checkoutProps.form.customer_id = order.customer_id;
             this.address.form.user_id = order.customer_id;
-            this.temp.instruction = order.instruction ?? '';
+            this.temp.instruction = order.instruction ?? "";
             this.checkoutProps.form.pos_payment_method = order.pos_payment_method ?? posPaymentMethodEnum.CASH;
 
             if (order.order_type === orderTypeEnum.DELIVERY) {
                 this.deliveryOrder();
                 this.checkoutProps.form.order_type = orderTypeEnum.DELIVERY;
-                this.deliveryChargeInput = order.delivery_charge ? String(order.delivery_charge) : '';
+                // Keep the delivery charge the order was saved with.
+                this.deliveryChargeInput = order.delivery_charge ? String(order.delivery_charge) : "";
                 this.checkoutProps.form.delivery_charge = order.delivery_charge;
                 this.deliveryChargeEdited = true;
-                this.addressInput = order.address ?? '';
-                // Link the order's address to the customer's saved one once those are loaded
+                this.addressInput = order.address ?? "";
                 this.$store.dispatch("user/addressLists", {
                     id: order.customer_id,
                     order_column: "id",
@@ -1042,23 +1038,20 @@ export default {
             }
         },
         exitEdit: function () {
-            if (!this.checkoutProps.editOrderId) {
-                return;
-            }
-            this.editOrder = null;
-            this.checkoutProps.editOrderId = null;
-            if (this.$route.query.edit) {
-                this.$router.replace({ name: 'admin.pos' });
+            if (this.checkoutProps.editOrderId) {
+                this.editOrder = null;
+                this.checkoutProps.editOrderId = null;
+                if (this.$route.query.edit) {
+                    this.$router.replace({ name: "admin.pos" });
+                }
             }
         },
         orderSaved: function () {
-            // The payment modal already cleared the cart and fetched a fresh token
             this.exitEdit();
-            this.temp.instruction = '';
+            this.temp.instruction = "";
         },
         orderSubmit: function () {
             this.loading.isActive = true;
-            // Quantity changes clear the cart discount, so take the one currently shown
             this.checkoutProps.form.discount = parseFloat(this.posDiscount) || 0;
             this.checkoutProps.form.subtotal = this.subtotal;
             this.checkoutProps.form.total = parseFloat(this.subtotal + this.checkoutProps.form.delivery_charge - this.checkoutProps.form.discount).toFixed(this.setting.site_digit_after_decimal_point);
@@ -1291,34 +1284,32 @@ export default {
             this.setDeliveryCharge();
         },
         setDeliveryCharge: function () {
-            // A charge typed by hand wins over the default until the order type or
-            // the customer changes, since the amount depends on the delivery location.
-            if (this.deliveryChargeEdited) {
-                return;
+            // A charge typed in by the cashier is kept until the order type or customer is reset.
+            if (!this.deliveryChargeEdited) {
+                if (this.checkoutProps.form.order_type !== orderTypeEnum.DELIVERY) {
+                    this.checkoutProps.form.delivery_charge = 0;
+                    this.deliveryChargeInput = "";
+                    return;
+                }
+                const charge = parseFloat(this.setting.order_setup_basic_delivery_charge || 0);
+                this.checkoutProps.form.delivery_charge = isNaN(charge) ? 0 : charge;
+                this.deliveryChargeInput = this.checkoutProps.form.delivery_charge ? String(this.checkoutProps.form.delivery_charge) : "";
             }
-            if (this.checkoutProps.form.order_type !== orderTypeEnum.DELIVERY) {
-                this.checkoutProps.form.delivery_charge = 0;
-                this.deliveryChargeInput = '';
-                return;
-            }
-            const defaultCharge = parseFloat(this.setting.order_setup_basic_delivery_charge || 0);
-            this.checkoutProps.form.delivery_charge = isNaN(defaultCharge) ? 0 : defaultCharge;
-            this.deliveryChargeInput = this.checkoutProps.form.delivery_charge ? String(this.checkoutProps.form.delivery_charge) : '';
         },
         applyDeliveryCharge: function () {
-            const amount = parseFloat(this.deliveryChargeInput);
-            this.checkoutProps.form.delivery_charge = isNaN(amount) ? 0 : amount;
+            const charge = parseFloat(this.deliveryChargeInput);
+            this.checkoutProps.form.delivery_charge = isNaN(charge) ? 0 : charge;
             this.deliveryChargeEdited = true;
         },
         normalizeDeliveryCharge: function () {
-            const amount = parseFloat(this.deliveryChargeInput);
-            if (isNaN(amount)) {
-                this.deliveryChargeInput = '';
+            const charge = parseFloat(this.deliveryChargeInput);
+            if (isNaN(charge)) {
+                this.deliveryChargeInput = "";
                 this.checkoutProps.form.delivery_charge = 0;
                 return;
             }
-            this.deliveryChargeInput = String(amount);
-            this.checkoutProps.form.delivery_charge = amount;
+            this.deliveryChargeInput = String(charge);
+            this.checkoutProps.form.delivery_charge = charge;
         },
         // Stores a newly typed address against the customer so it shows up in the
         // dropdown next time, then resolves with the address id to use.
@@ -1373,30 +1364,30 @@ export default {
             this.selectedAddress = {};
             this.checkoutProps.form.address_id = null;
             this.checkoutProps.form.delivery_charge = 0;
-            this.deliveryChargeInput = '';
+            this.deliveryChargeInput = "";
             this.deliveryChargeEdited = false;
         },
     },
     beforeUnmount() {
-        // Don't leave an edited order's items behind in the cart for the next new order
+        // Don't leave an edited order's items sitting in the cart for the next POS visit.
         if (this.checkoutProps.editOrderId) {
-            this.$store.dispatch('posCart/resetCart').then().catch();
+            this.$store.dispatch("posCart/resetCart").then().catch();
         }
     },
     watch: {
         "customerProps.form.password"(newValue) {
             this.customerProps.form.password_confirmation = newValue;
         },
-        "$route.query.edit"(id) {
-            if (id && String(id) !== String(this.checkoutProps.editOrderId)) {
-                this.startEdit(id);
-            } else if (!id && this.checkoutProps.editOrderId) {
+        "$route.query.edit"(orderId) {
+            if (orderId && String(orderId) !== String(this.checkoutProps.editOrderId)) {
+                this.startEdit(orderId);
+            } else if (!orderId && this.checkoutProps.editOrderId) {
                 this.resetCart();
             }
         },
         carts: {
             handler(newCarts) {
-                // Emptying the cart of an order being edited keeps that order's customer and type
+                // The cart is briefly empty while an order is being loaded for editing.
                 if ((!newCarts || newCarts.length === 0) && !this.checkoutProps.editOrderId) {
                     this.discount = null;
                     this.discountType = discountTypeEnum.PERCENTAGE;

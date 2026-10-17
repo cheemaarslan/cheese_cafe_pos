@@ -156,8 +156,7 @@
                                         :for="variation.item_attribute_id + '-' + variation.name"
                                         class="w-full min-w-[120px] h-[52px] cursor-pointer py-2 px-3 gap-2 rounded-lg flex items-center border transition border-[#F7F7FC] bg-[#F7F7FC]">
                                         <div class="custom-radio sm">
-                                            <input :value="variation.id"
-                                                @click="toggleVariation(variation)"
+                                            <input :value="variation.id" @click="toggleVariation(variation)"
                                                 :checked="temp.item_variations.variations[variation.item_attribute_id] === variation.id"
                                                 type="radio" :id="variation.item_attribute_id + '-' + variation.name"
                                                 class="custom-radio-field">
@@ -456,6 +455,7 @@ export default {
             });
             this.totalPriceSetup();
         },
+        // Variations are optional: clicking the selected one again clears it.
         toggleVariation: function (variation) {
             const attributeId = variation.item_attribute_id;
             if (this.temp.item_variations.variations[attributeId] === variation.id) {
@@ -470,15 +470,15 @@ export default {
                 this.changeVariation(attributeId, variation.id, variation.name, variation.convert_price);
             }
         },
+        // Only the variations actually chosen (the "--" option leaves an attribute unset).
         selectedVariations: function () {
-            // variations (numeric keys) and names are paired by position at checkout, so build both in attribute id order
             const variations = {};
             const names = {};
-            _.forEach(_.sortBy(this.item.itemAttributes, "id"), (element) => {
-                const variation = _.find(this.item.variations[element.id], { id: this.temp.item_variations.variations[element.id] });
+            _.forEach(_.sortBy(this.item.itemAttributes, "id"), (attribute) => {
+                const variation = _.find(this.item.variations[attribute.id], { id: this.temp.item_variations.variations[attribute.id] });
                 if (variation) {
-                    variations[element.id] = variation.id;
-                    names[element.name] = variation.name;
+                    variations[attribute.id] = variation.id;
+                    names[attribute.name] = variation.name;
                 }
             });
             return { variations: variations, names: names };
@@ -489,7 +489,6 @@ export default {
                     this.changeVariation(attributeId, variationId, variation.name, variation.convert_price);
                 }
             });
-            // "--" chosen: no variation matched, so just recalculate without it
             this.totalPriceSetup();
         },
         changeExtra: function (e, id, name) {

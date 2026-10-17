@@ -1,5 +1,5 @@
-import axios from 'axios';
-import appService from '../../services/appService';
+import axios from "axios";
+import appService from "../../services/appService";
 
 export const inventory = {
     namespaced: true,
@@ -14,74 +14,81 @@ export const inventory = {
         },
     },
     getters: {
-        lists: state => state.lists,
-        pagination: state => state.pagination,
-        page: state => state.page,
-        show: state => state.show,
-        temp: state => state.temp,
+        lists: function (state) {
+            return state.lists;
+        },
+        pagination: function (state) {
+            return state.pagination;
+        },
+        page: function (state) {
+            return state.page;
+        },
+        show: function (state) {
+            return state.show;
+        },
+        temp: function (state) {
+            return state.temp;
+        },
     },
     actions: {
-        lists(context, payload = {}) {
-            return axios.get('admin/inventory' + appService.requestHandler(payload)).then(res => {
-                if (typeof payload.vuex === 'undefined' || payload.vuex === true) {
-                    context.commit('lists', res.data.data);
-                    context.commit('page', res.data.meta);
-                    context.commit('pagination', res.data);
+        lists: function (context, payload = {}) {
+            return axios.get("admin/inventory" + appService.requestHandler(payload)).then((res) => {
+                if (typeof payload.vuex === "undefined" || payload.vuex === true) {
+                    context.commit("lists", res.data.data);
+                    context.commit("page", res.data.meta);
+                    context.commit("pagination", res.data);
                 }
                 return res;
             });
         },
-        save(context, payload) {
-            const editing = context.state.temp.isEditing;
-            const url = editing
+        save: function (context, payload) {
+            const url = context.state.temp.isEditing
                 ? `/admin/inventory/${context.state.temp.temp_id}`
-                : '/admin/inventory';
+                : "/admin/inventory";
 
-            return axios.post(url, payload.form).then(res => {
-                context.dispatch('lists', payload.search);
-                context.commit('reset');
+            return axios.post(url, payload.form).then((res) => {
+                context.dispatch("lists", payload.search);
+                context.commit("reset");
                 return res;
             });
         },
-        edit(context, id) {
-            context.commit('temp', id);
+        edit: function (context, payload) {
+            context.commit("temp", payload);
         },
-        destroy(context, payload) {
-            return axios.delete(`admin/inventory/${payload.id}`).then(res => {
-                context.dispatch('lists', payload.search);
+        destroy: function (context, payload) {
+            return axios.delete(`admin/inventory/${payload.id}`).then((res) => {
+                context.dispatch("lists", payload.search);
                 return res;
             });
         },
-        show(context, id) {
-            return axios.get(`admin/inventory/show/${id}`).then(res => {
-                context.commit('show', res.data.data);
+        show: function (context, payload) {
+            return axios.get(`admin/inventory/show/${payload}`).then((res) => {
+                context.commit("show", res.data.data);
                 return res;
             });
         },
-        reset(context) {
-            context.commit('reset');
+        reset: function (context) {
+            context.commit("reset");
         },
     },
     mutations: {
-        lists(state, payload) {
+        lists: function (state, payload) {
             state.lists = payload;
         },
-        pagination(state, payload) {
+        pagination: function (state, payload) {
             state.pagination = payload;
         },
-        page(state, payload) {
-            state.page = payload
-                ? { from: payload.from, to: payload.to, total: payload.total }
-                : {};
+        page: function (state, payload) {
+            state.page = payload ? { from: payload.from, to: payload.to, total: payload.total } : {};
         },
-        show(state, payload) {
+        show: function (state, payload) {
             state.show = payload;
         },
-        temp(state, id) {
-            state.temp.temp_id = id;
+        temp: function (state, payload) {
+            state.temp.temp_id = payload;
             state.temp.isEditing = true;
         },
-        reset(state) {
+        reset: function (state) {
             state.temp.temp_id = null;
             state.temp.isEditing = false;
         },

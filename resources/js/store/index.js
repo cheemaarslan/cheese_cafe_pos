@@ -10,6 +10,8 @@ import { branch } from "./modules/branch";
 import { offer } from "./modules/offer";
 import { item } from "./modules/item";
 import { inventory } from "./modules/inventory";
+import { expense } from "./modules/expense";
+import { profitLoss } from "./modules/profitLoss";
 import { itemVariation } from "./modules/itemVariation";
 import { onlineOrder } from "./modules/onlineOrder";
 import { tax } from "./modules/tax";
@@ -125,6 +127,8 @@ export default new createStore({
         offer,
         item,
         inventory,
+        expense,
+        profitLoss,
         itemVariation,
         tax,
         currency,

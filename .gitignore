@@ -59,3 +59,9 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 /.claude/settings.local.json
+public/error_log
+.ftpquota
+mix-build.log
+public/css/app.css-old
+public/js-old/
+public/mix-manifest.json-old

@@ -183,7 +183,7 @@
     .product-card-grid-badge-text { @apply capitalize text-sm font-semibold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white }
     .product-card-grid-content-group { @apply py-4 px-3 rounded-b-2xl h-full flex flex-col justify-between }
     .product-card-grid-header-group { @apply flex items-start gap-2 mb-2 }
-    .product-card-grid-title { @apply text-sm font-semibold capitalize text-ellipsis whitespace-nowrap overflow-hidden w-fit max-w-[200px] }
+    .product-card-grid-title { @apply w-fit max-w-[200px] text-sm font-semibold capitalize text-ellipsis whitespace-nowrap overflow-hidden }
     .product-card-grid-describe { @apply text-xs text-ellipsis mb-3 }
     .product-card-grid-footer-group { @apply flex items-center justify-between gap-2 }
     .product-card-grid-price-group { @apply flex flex-wrap items-center gap-x-2 }

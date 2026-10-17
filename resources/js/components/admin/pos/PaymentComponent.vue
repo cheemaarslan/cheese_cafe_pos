@@ -221,7 +221,7 @@ export default {
 
                 this.$store.dispatch("defaultAccess/show").then((res) => {
                     this.$props.props.form.branch_id = res.data.data.branch_id;
-                    // An order opened for editing is updated in place instead of placed again
+                    // Editing an existing order updates it in place instead of creating a new one.
                     const request = this.$props.props.editOrderId
                         ? this.$store.dispatch('posOrder/update', { id: this.$props.props.editOrderId, form: this.$props.props.form })
                         : this.$store.dispatch('posOrder/save', this.$props.props.form);

@@ -104,6 +104,36 @@ class LoginController extends Controller
         ], 201);
     }
 
+    /**
+     * Fresh menu + permissions for the logged-in user. The frontend keeps the login response in
+     * localStorage, so master.blade.php calls this on page load to pick up menu items and role
+     * permissions that were added after the user logged in.
+     *
+     * @throws \Exception
+     */
+    public function menu(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!isset($user->roles[0])) {
+            return new JsonResponse([
+                'errors' => ['validation' => trans('all.message.role_exist')]
+            ], 400);
+        }
+
+        $permission        = PermissionResource::collection($this->permissionService->permission($user->roles[0]));
+        $menus             = MenuResource::collection(collect($this->menuService->menu($user->roles[0])));
+        $defaultPermission = AppLibrary::defaultPermission($permission);
+        $defaultMenu       = (object)AppLibrary::defaultMenu($this->menuService->menu($user->roles[0]), $defaultPermission);
+
+        return new JsonResponse([
+            'menu'              => $menus,
+            'permission'        => $permission,
+            'defaultPermission' => $defaultPermission,
+            'defaultMenu'       => $defaultMenu,
+        ], 200);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

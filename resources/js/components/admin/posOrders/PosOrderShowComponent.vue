@@ -147,8 +147,7 @@
                     <WhatsappInvoiceComponent popover :order="order" :orderItems="orderItems"
                         :receipt="() => $refs.receipt && $refs.receipt.$refs.receiptBody" />
 
-                    <router-link v-if="permissionChecker('pos')"
-                        :to="{ name: 'admin.pos', query: { edit: order.id } }"
+                    <router-link v-if="permissionChecker('pos')" :to="{ name: 'admin.pos', query: { edit: order.id } }"
                         class="flex items-center justify-center gap-2 px-4 h-[38px] rounded border border-primary bg-white text-primary">
                         <i class="lab lab-edit-line lab-font-size-16"></i>
                         <span class="text-sm capitalize">{{ $t('button.edit_order') }}</span>
@@ -429,8 +428,8 @@ export default {
         },
     },
     methods: {
-        permissionChecker: function (e) {
-            return appService.permissionChecker(e);
+        permissionChecker: function (permissionName) {
+            return appService.permissionChecker(permissionName);
         },
         withoutCurrency: function (amount) {
             return appService.withoutCurrency(amount);

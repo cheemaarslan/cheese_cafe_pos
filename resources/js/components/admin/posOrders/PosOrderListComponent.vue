@@ -126,9 +126,9 @@
                                 <div class="flex justify-start items-center sm:items-start sm:justify-start gap-1.5">
                                     <SmIconViewComponent :link="'admin.pos-orders.show'" :id="order.id"
                                         v-if="permissionChecker('pos-orders')" />
-                                    <router-link class="db-table-action edit"
-                                        :to="{ name: 'admin.pos', query: { edit: order.id } }"
-                                        v-if="permissionChecker('pos') && order.status !== enums.orderStatusEnum.CANCELED && order.status !== enums.orderStatusEnum.REJECTED">
+                                    <router-link
+                                        v-if="permissionChecker('pos') && order.status !== enums.orderStatusEnum.CANCELED && order.status !== enums.orderStatusEnum.REJECTED"
+                                        class="db-table-action edit" :to="{ name: 'admin.pos', query: { edit: order.id } }">
                                         <i class="lab lab-edit-line"></i>
                                         <span class="db-tooltip">{{ $t('button.edit') }}</span>
                                     </router-link>

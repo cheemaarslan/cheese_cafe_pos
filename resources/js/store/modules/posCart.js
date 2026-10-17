@@ -62,7 +62,7 @@ export const posCart = {
                     } else {
                         isNew = true;
                         _.forEach(state.lists, (list, listKey) => {
-                            // Custom (extra) items are never merged, each one is its own cart row
+                            // A custom (open) item is never merged into another cart line.
                             if (!pay.is_custom && !list.is_custom && list.item_id === pay.item_id) {
 
                                 if (state.lists[listKey].item_variations.variations !== "undefined") {

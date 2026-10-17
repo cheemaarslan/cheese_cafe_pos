@@ -3,15 +3,17 @@
         <div class="col-12">
             <BreadcrumbComponent />
         </div>
-        <router-view />
+        <router-view></router-view>
     </div>
 </template>
 
 <script>
-import BreadcrumbComponent from '../components/BreadcrumbComponent';
+import BreadcrumbComponent from "../components/BreadcrumbComponent";
 
 export default {
     name: 'InventoryComponent',
-    components: { BreadcrumbComponent },
-};
+    components: {
+        BreadcrumbComponent
+    }
+}
 </script>

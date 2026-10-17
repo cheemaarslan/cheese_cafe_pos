@@ -154,7 +154,61 @@
         const APP_DEMO = "{{ env('MIX_DEMO') }}";
     </script>
 
-    <script defer src="{{ mix('js/app.js') }}"></script>
+    {{-- The sidebar menu + permissions are saved in localStorage at login (vuex-persistedstate), so a
+         browser that logged in before a menu item / permission was added kept showing the old sidebar
+         until it logged out. Refresh them from the server first, then boot app.js. --}}
+    <link rel="preload" href="{{ mix('js/app.js') }}" as="script">
+    <script>
+        (function () {
+            let appLoaded = false;
+            const loadApp = function () {
+                if (appLoaded) return;
+                appLoaded = true;
+                const script = document.createElement('script');
+                script.src = "{{ mix('js/app.js') }}";
+                document.body.appendChild(script);
+            };
+
+            try {
+                const vuex = JSON.parse(localStorage.getItem('vuex') || 'null');
+                const auth = vuex && vuex.auth;
+                if (!auth || !auth.authStatus || !auth.authToken) {
+                    loadApp();
+                    return;
+                }
+
+                // Never hold the app back for long: boot with the stored data if the server is slow.
+                setTimeout(loadApp, 3000);
+
+                const headers = {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + auth.authToken,
+                    'x-api-key': APP_KEY,
+                };
+                const language = vuex.globalState && vuex.globalState.lists && vuex.globalState.lists.language_code;
+                if (language) {
+                    headers['x-localization'] = language;
+                }
+
+                fetch(APP_URL.replace(/\/+$/, '') + '/api/auth/menu', { headers: headers })
+                    .then(function (res) {
+                        return res.ok ? res.json() : null;
+                    })
+                    .then(function (data) {
+                        if (!data || !Array.isArray(data.menu) || appLoaded) return;
+                        auth.authMenu = data.menu;
+                        auth.authPermission = data.permission;
+                        auth.authDefaultPermission = data.defaultPermission;
+                        auth.authDefaultMenu = data.defaultMenu;
+                        localStorage.setItem('vuex', JSON.stringify(vuex));
+                    })
+                    .catch(function () {})
+                    .then(loadApp);
+            } catch (e) {
+                loadApp();
+            }
+        })();
+    </script>
     <script defer src="{{ asset('themes/default/js/drawer.js') }}"></script>
     <script defer src="{{ asset('themes/default/js/modal.js') }}"></script>
     <script defer src="{{ asset('themes/default/js/customScript.js') }}"></script>

@@ -887,6 +887,7 @@ export default {
             });
             this.totalPriceSetup();
         },
+        // Variations are optional: clicking the selected one again clears it.
         toggleVariation: function (variation) {
             const attributeId = variation.item_attribute_id;
             if (
@@ -909,17 +910,17 @@ export default {
                 );
             }
         },
+        // Only the variations actually chosen (a cleared select leaves an attribute unset).
         selectedVariations: function () {
-            // variations (numeric keys) and names are paired by position at checkout, so build both in attribute id order
             const variations = {};
             const names = {};
-            _.forEach(_.sortBy(this.item.itemAttributes, "id"), (element) => {
-                const variation = _.find(this.item.variations[element.id], {
-                    id: this.temp.item_variations.variations[element.id],
+            _.forEach(_.sortBy(this.item.itemAttributes, "id"), (attribute) => {
+                const variation = _.find(this.item.variations[attribute.id], {
+                    id: this.temp.item_variations.variations[attribute.id],
                 });
                 if (variation) {
-                    variations[element.id] = variation.id;
-                    names[element.name] = variation.name;
+                    variations[attribute.id] = variation.id;
+                    names[attribute.name] = variation.name;
                 }
             });
             return { variations: variations, names: names };
