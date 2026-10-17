@@ -35,35 +35,65 @@
 
                         <div class="form-col-12 sm:form-col-6">
                             <label for="inventory-unit" class="db-field-title required">{{ $t('label.unit') }}</label>
-                            <input id="inventory-unit" v-model="props.form.unit" :class="errors.unit ? 'invalid' : ''"
-                                class="db-field-control" type="text" :placeholder="$t('placeholder.inventory_unit')">
-                            <small v-if="errors.unit" class="db-field-alert">{{ errors.unit[0] }}</small>
+                            <select id="inventory-unit" v-model="purchaseUnit" :class="errors.purchase_unit ? 'invalid' : ''"
+                                class="db-field-control f-b-custom-select">
+                                <option value="" disabled>--</option>
+                                <option v-for="unit in unitOptions" :key="unit.id" :value="unit.id">{{ unit.name }}</option>
+                            </select>
+                            <small v-if="errors.purchase_unit" class="db-field-alert">{{ errors.purchase_unit[0] }}</small>
+                            <small v-else-if="unitHint" class="block mt-1 text-xs text-gray-500">{{ unitHint }}</small>
                         </div>
 
-                        <div class="form-col-12 sm:form-col-6">
+                        <div v-if="stockIsTotal" class="form-col-12 sm:form-col-6">
                             <label for="inventory-quantity" class="db-field-title required">
-                                {{ $t('label.stock_quantity') }}
+                                {{ $t('label.stock_quantity') }}<span v-if="unitLabel"> ({{ unitLabel }})</span>
                             </label>
                             <input id="inventory-quantity" v-model="props.form.quantity"
                                 :class="errors.quantity ? 'invalid' : ''" class="db-field-control" type="number" min="0"
-                                step="0.001">
+                                step="any">
                             <small v-if="errors.quantity" class="db-field-alert">{{ errors.quantity[0] }}</small>
+                            <small v-else-if="isEditing" class="block mt-1 text-xs text-gray-500">
+                                {{ $t('message.inventory_unit_changed_hint') }}
+                            </small>
+                        </div>
+
+                        <div v-else class="form-col-12 sm:form-col-6">
+                            <label for="inventory-add-quantity" class="db-field-title">
+                                {{ $t('label.add_stock') }}<span v-if="unitLabel"> ({{ unitLabel }})</span>
+                            </label>
+                            <input id="inventory-add-quantity" v-model="props.form.add_quantity"
+                                :class="errors.add_quantity ? 'invalid' : ''" class="db-field-control" type="number"
+                                step="any" placeholder="0">
+                            <small v-if="errors.add_quantity" class="db-field-alert">{{ errors.add_quantity[0] }}</small>
+                            <small class="block mt-1 text-xs text-gray-500">
+                                {{ $t('label.current_stock') }}:
+                                <span :class="currentStock < 0 ? 'font-semibold text-red-600' : 'font-semibold'">
+                                    {{ cleanNumber(currentStock) }} {{ unitLabel }}
+                                </span>
+                                <template v-if="newStock !== null">
+                                    → {{ $t('label.new_stock') }}:
+                                    <span class="font-semibold">{{ cleanNumber(newStock) }} {{ unitLabel }}</span>
+                                </template>
+                                <br>{{ $t('message.inventory_add_stock_hint') }}
+                            </small>
                         </div>
 
                         <div class="form-col-12 sm:form-col-6">
                             <label for="inventory-minimum" class="db-field-title required">
-                                {{ $t('label.minimum_stock') }}
+                                {{ $t('label.minimum_stock') }}<span v-if="unitLabel"> ({{ unitLabel }})</span>
                             </label>
                             <input id="inventory-minimum" v-model="props.form.minimum_stock"
                                 :class="errors.minimum_stock ? 'invalid' : ''" class="db-field-control" type="number"
-                                min="0" step="0.001">
+                                min="0" step="any">
                             <small v-if="errors.minimum_stock" class="db-field-alert">
                                 {{ errors.minimum_stock[0] }}
                             </small>
                         </div>
 
                         <div class="form-col-12 sm:form-col-6">
-                            <label for="inventory-cost" class="db-field-title">{{ $t('label.unit_cost') }}</label>
+                            <label for="inventory-cost" class="db-field-title">
+                                {{ $t('label.unit_cost') }}<span v-if="unitLabel"> ({{ $t('label.per_unit', { unit: unitLabel }) }})</span>
+                            </label>
                             <input id="inventory-cost" v-model="props.form.unit_cost"
                                 :class="errors.unit_cost ? 'invalid' : ''" class="db-field-control" type="number"
                                 min="0" step="0.000001">
@@ -134,6 +164,7 @@ import LoadingComponent from "../components/LoadingComponent";
 import statusEnum from "../../../enums/modules/statusEnum";
 import alertService from "../../../services/alertService";
 import appService from "../../../services/appService";
+import inventoryUnitService from "../../../services/inventoryUnitService";
 
 export default {
     name: 'InventoryCreateComponent',
@@ -156,16 +187,87 @@ export default {
     computed: {
         addButton: function () {
             return { title: this.$t('button.add_inventory_item') };
+        },
+        unitOptions: function () {
+            return inventoryUnitService.units.map((unit) => ({ id: unit, name: this.$t('label.unit_' + unit) }));
+        },
+        purchaseUnit: {
+            get: function () {
+                return this.props.form.purchase_unit;
+            },
+            set: function (unit) {
+                this.changeUnit(unit);
+            }
+        },
+        unitLabel: function () {
+            return inventoryUnitService.label(this.props.form.purchase_unit);
+        },
+        isEditing: function () {
+            return this.$store.getters['inventory/temp'].isEditing;
+        },
+        // A new item, or one switched to another kind of unit (pcs to litre), is given its stock as a total;
+        // otherwise stock bought is added to the current stock
+        stockIsTotal: function () {
+            return !this.isEditing
+                || inventoryUnitService.baseUnit(this.props.form.purchase_unit) !== this.props.form.original_unit;
+        },
+        currentStock: function () {
+            return Number(this.props.form.current_quantity || 0)
+                / inventoryUnitService.factor(this.props.form.purchase_unit);
+        },
+        newStock: function () {
+            const added = this.props.form.add_quantity;
+            if (added === '' || added === null || typeof added === 'undefined' || isNaN(Number(added))
+                || Number(added) === 0) {
+                return null;
+            }
+            return Number((this.currentStock + Number(added)).toFixed(6));
+        },
+        unitHint: function () {
+            const unit = this.props.form.purchase_unit;
+            const factor = inventoryUnitService.factor(unit);
+            if (!unit || factor === 1) {
+                return '';
+            }
+            return this.$t('message.inventory_unit_hint', {
+                unit: inventoryUnitService.label(unit),
+                factor: factor,
+                base: inventoryUnitService.label(inventoryUnitService.baseUnit(unit))
+            });
         }
     },
     methods: {
+        changeUnit: function (unit) {
+            const form = this.props.form;
+            const from = form.purchase_unit;
+
+            // Same kind of unit (e.g. kg to g): convert what's already typed so it still means the same stock
+            if (from && unit && from !== unit
+                && inventoryUnitService.baseUnit(from) === inventoryUnitService.baseUnit(unit)) {
+                const ratio = inventoryUnitService.factor(from) / inventoryUnitService.factor(unit);
+                const scale = (value, by) => value === '' || value === null || isNaN(Number(value))
+                    ? value
+                    : Number((Number(value) * by).toFixed(6));
+
+                form.quantity = scale(form.quantity, ratio);
+                form.add_quantity = scale(form.add_quantity, ratio);
+                form.minimum_stock = scale(form.minimum_stock, ratio);
+                form.unit_cost = scale(form.unit_cost, 1 / ratio);
+            }
+
+            form.purchase_unit = unit;
+        },
+        cleanNumber: function (value) {
+            return Number(value).toLocaleString(undefined, { maximumFractionDigits: 6 });
+        },
         emptyForm: function () {
             return {
                 name: '',
                 sku: '',
                 category: '',
                 quantity: 0,
-                unit: '',
+                add_quantity: '',
+                purchase_unit: '',
                 minimum_stock: 0,
                 unit_cost: '',
                 supplier: '',

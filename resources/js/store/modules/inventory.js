@@ -8,6 +8,9 @@ export const inventory = {
         page: {},
         pagination: [],
         show: {},
+        transactions: [],
+        transactionPage: {},
+        transactionPagination: [],
         temp: {
             temp_id: null,
             isEditing: false,
@@ -25,6 +28,15 @@ export const inventory = {
         },
         show: function (state) {
             return state.show;
+        },
+        transactions: function (state) {
+            return state.transactions;
+        },
+        transactionPage: function (state) {
+            return state.transactionPage;
+        },
+        transactionPagination: function (state) {
+            return state.transactionPagination;
         },
         temp: function (state) {
             return state.temp;
@@ -67,6 +79,12 @@ export const inventory = {
                 return res;
             });
         },
+        transactions: function (context, payload) {
+            return axios.get(`admin/inventory/${payload.id}/transactions` + appService.requestHandler(payload.search)).then((res) => {
+                context.commit("transactions", res.data);
+                return res;
+            });
+        },
         reset: function (context) {
             context.commit("reset");
         },
@@ -83,6 +101,13 @@ export const inventory = {
         },
         show: function (state, payload) {
             state.show = payload;
+        },
+        transactions: function (state, payload) {
+            state.transactions = payload.data;
+            state.transactionPagination = payload;
+            state.transactionPage = payload.meta
+                ? { from: payload.meta.from, to: payload.meta.to, total: payload.meta.total }
+                : {};
         },
         temp: function (state, payload) {
             state.temp.temp_id = payload;

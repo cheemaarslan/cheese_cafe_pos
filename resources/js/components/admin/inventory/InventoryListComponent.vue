@@ -104,12 +104,14 @@
                             <td class="db-table-body-td">
                                 <span
                                     :class="item.is_low_stock ? 'font-semibold text-red-600' : 'font-semibold text-green-600'">
-                                    {{ cleanNumber(item.quantity) }} {{ item.unit }}
+                                    {{ cleanNumber(item.purchase_quantity) }} {{ item.purchase_unit_label }}
                                 </span>
                             </td>
-                            <td class="db-table-body-td">{{ cleanNumber(item.minimum_stock) }} {{ item.unit }}</td>
                             <td class="db-table-body-td">
-                                {{ item.unit_cost === null ? '-' : cleanNumber(item.unit_cost) }}
+                                {{ cleanNumber(item.purchase_minimum_stock) }} {{ item.purchase_unit_label }}
+                            </td>
+                            <td class="db-table-body-td">
+                                {{ item.purchase_unit_cost === null ? '-' : cleanNumber(item.purchase_unit_cost) + ' / ' + item.purchase_unit_label }}
                             </td>
                             <td class="db-table-body-td">
                                 <span :class="statusClass(item.status)">{{ statusLabel(item.status) }}</span>
@@ -252,7 +254,8 @@ export default {
                 sku: '',
                 category: '',
                 quantity: 0,
-                unit: '',
+                add_quantity: '',
+                purchase_unit: '',
                 minimum_stock: 0,
                 unit_cost: '',
                 supplier: '',
@@ -307,10 +310,15 @@ export default {
                 name: item.name,
                 sku: item.sku,
                 category: item.category,
-                quantity: item.quantity,
-                unit: item.unit,
-                minimum_stock: item.minimum_stock,
-                unit_cost: item.unit_cost === null ? '' : item.unit_cost,
+                // Entered in the purchase unit (kg, litre...); the server converts to the base unit
+                quantity: item.purchase_quantity,
+                purchase_unit: item.purchase_unit,
+                minimum_stock: item.purchase_minimum_stock,
+                unit_cost: item.purchase_unit_cost === null ? '' : item.purchase_unit_cost,
+                // Stock bought is entered as an amount added to the current stock (base unit, may be negative)
+                add_quantity: '',
+                current_quantity: item.quantity,
+                original_unit: item.unit,
                 supplier: item.supplier,
                 notes: item.notes,
                 status: item.status

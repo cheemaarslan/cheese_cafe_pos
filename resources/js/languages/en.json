@@ -374,6 +374,24 @@
         "stock_level": "Stock Level",
         "low_stock": "Low Stock",
         "low_stock_only": "Low Stock Only",
+        "unit_kg": "Kilogram (kg)",
+        "unit_g": "Gram (g)",
+        "unit_l": "Litre (L)",
+        "unit_ml": "Millilitre (ml)",
+        "unit_pcs": "Piece (pcs)",
+        "unit_dozen": "Dozen (12 pcs)",
+        "per_unit": "per {unit}",
+        "add_stock": "Add Stock",
+        "new_stock": "New Stock",
+        "stock_history": "Stock History",
+        "by": "By",
+        "inventory_opening": "Opening Stock",
+        "inventory_purchase": "Purchase",
+        "inventory_adjustment": "Manual Adjustment",
+        "inventory_wastage": "Wastage",
+        "inventory_order": "Order",
+        "inventory_order_update": "Order Update",
+        "inventory_order_return": "Order Return",
         "extras": "Extras",
         "addons": "Addons",
         "order_id": "Order ID",
@@ -864,6 +882,9 @@
         "something_wrong": "Something Wrong."
     },
     "message": {
+        "inventory_unit_hint": "Stock is kept in {base}: 1 {unit} = {factor} {base}.",
+        "inventory_add_stock_hint": "Enter the quantity bought; it is added to the current stock. Use a minus value to remove stock.",
+        "inventory_unit_changed_hint": "The unit type changed, so enter the full stock in the new unit.",
         "extra_item_required": "Please enter an extra item name.",
         "extra_item_invalid": "Each extra item needs a name, and the price can't be negative.",
         "pagination_label": "Showing {from} to {to} of {total} entries",
@@ -955,6 +976,6 @@
         "whatsapp_invoice_total": "Total: {total}",
         "whatsapp_invoice_download": "View or download your invoice:",
         "profit_loss_formula": "Income from confirmed orders minus inventory purchases and other expenses.",
-        "inventory_purchase_hint": "Stock is counted as a purchase when an item is added or its quantity is increased. Deleting a wrong entry here removes it from the expenses only; the stock quantity is not changed."
+        "inventory_purchase_hint": "Stock is counted as a purchase when an item is added with stock or stock is added to it. Deleting a wrong entry here removes it from the expenses only; the stock quantity is not changed."
     }
 }

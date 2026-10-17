@@ -623,6 +623,7 @@ Route::prefix('admin')->name('admin.')->middleware(['installed', 'apiKey', 'loca
     Route::prefix('inventory')->name('inventory.')->group(function () {
         Route::get('/', [InventoryItemController::class, 'index']);
         Route::get('/show/{inventoryItem}', [InventoryItemController::class, 'show']);
+        Route::get('/{inventoryItem}/transactions', [InventoryItemController::class, 'transactions']);
         Route::post('/', [InventoryItemController::class, 'store']);
         Route::match(['post', 'put', 'patch'], '/{inventoryItem}', [InventoryItemController::class, 'update']);
         Route::delete('/{inventoryItem}', [InventoryItemController::class, 'destroy']);
