@@ -10,6 +10,9 @@ import { branch } from "./modules/branch";
 import { offer } from "./modules/offer";
 import { item } from "./modules/item";
 import { inventory } from "./modules/inventory";
+import { inventoryWastage } from "./modules/inventoryWastage";
+import { stockCount } from "./modules/stockCount";
+import { inventoryReport } from "./modules/inventoryReport";
 import { expense } from "./modules/expense";
 import { profitLoss } from "./modules/profitLoss";
 import { itemVariation } from "./modules/itemVariation";
@@ -51,6 +54,7 @@ import { timeSlot } from "./modules/timeSlot";
 import { employee } from "./modules/employee";
 import { employeeAddress } from "./modules/employeeAddress";
 import { itemExtra } from "./modules/itemExtra";
+import { itemIngredient } from "./modules/itemIngredient";
 import { itemAddon } from "./modules/itemAddon";
 import { language } from "./modules/language";
 import { frontendBranch } from "./modules/frontend/frontendBranch";
@@ -127,6 +131,9 @@ export default new createStore({
         offer,
         item,
         inventory,
+        inventoryWastage,
+        stockCount,
+        inventoryReport,
         expense,
         profitLoss,
         itemVariation,
@@ -167,6 +174,7 @@ export default new createStore({
         employee,
         employeeAddress,
         itemExtra,
+        itemIngredient,
         itemAddon,
         language,
         globalState,

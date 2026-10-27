@@ -18,6 +18,12 @@ export const profitLoss = {
                 return res;
             });
         },
+        export: function (context, payload = {}) {
+            return axios.get("admin/profit-loss/export" + appService.requestHandler(payload), { responseType: "blob" });
+        },
+        pdf: function (context, payload = {}) {
+            return axios.get("admin/profit-loss/pdf" + appService.requestHandler(payload), { responseType: "blob" });
+        },
         // Removes a wrongly entered stock purchase from the expenses (stock quantity is not touched).
         destroyPurchase: function (context, payload) {
             return axios.delete(`admin/profit-loss/inventory-purchase/${payload.id}`).then((res) => {

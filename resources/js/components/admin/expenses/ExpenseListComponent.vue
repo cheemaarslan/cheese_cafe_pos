@@ -37,7 +37,7 @@
                         </div>
                         <div class="col-12 sm:col-6 md:col-4 xl:col-3">
                             <label class="db-field-title after:hidden">{{ $t('label.date') }}</label>
-                            <Datepicker hideInputIcon autoApply :enableTimePicker="false" utc="false"
+                            <Datepicker hideInputIcon autoApply :enableTimePicker="false" :utc="false"
                                 @update:modelValue="handleDate" v-model="dateRange" range />
                         </div>
 

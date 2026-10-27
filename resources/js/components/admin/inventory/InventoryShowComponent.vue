@@ -178,7 +178,8 @@ export default {
                 [inventoryTransactionTypeEnum.WASTAGE]: 'inventory_wastage',
                 [inventoryTransactionTypeEnum.ORDER]: 'inventory_order',
                 [inventoryTransactionTypeEnum.ORDER_UPDATE]: 'inventory_order_update',
-                [inventoryTransactionTypeEnum.ORDER_RETURN]: 'inventory_order_return'
+                [inventoryTransactionTypeEnum.ORDER_RETURN]: 'inventory_order_return',
+                [inventoryTransactionTypeEnum.STOCK_COUNT]: 'inventory_stock_count'
             };
             return labels[type] ? this.$t('label.' + labels[type]) : '-';
         },

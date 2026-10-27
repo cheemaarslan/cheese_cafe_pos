@@ -5,6 +5,7 @@ const inventoryTransactionTypeEnum = Object.freeze({
     WASTAGE: 15,
     ORDER: 20,
     ORDER_UPDATE: 25,
-    ORDER_RETURN: 30
+    ORDER_RETURN: 30,
+    STOCK_COUNT: 35
 });
 export default inventoryTransactionTypeEnum;

@@ -65,3 +65,4 @@ mix-build.log
 public/css/app.css-old
 public/js-old/
 public/mix-manifest.json-old
+.build-zip-state.json

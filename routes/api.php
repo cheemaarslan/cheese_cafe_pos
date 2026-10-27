@@ -30,10 +30,14 @@ use App\Http\Controllers\Admin\ItemAddonController;
 use App\Http\Controllers\Admin\ItemAttributeController;
 use App\Http\Controllers\Admin\ItemCategoryController;
 use App\Http\Controllers\Admin\ItemController;
+use App\Http\Controllers\Admin\InventoryCountController;
 use App\Http\Controllers\Admin\InventoryItemController;
+use App\Http\Controllers\Admin\InventoryReportController;
+use App\Http\Controllers\Admin\InventoryWastageController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\ProfitLossController;
 use App\Http\Controllers\Admin\ItemExtraController;
+use App\Http\Controllers\Admin\ItemIngredientController;
 use App\Http\Controllers\Admin\ItemsReportController;
 use App\Http\Controllers\Admin\ItemVariationController;
 use App\Http\Controllers\Admin\KioskMachineController;
@@ -615,6 +619,11 @@ Route::prefix('admin')->name('admin.')->middleware(['installed', 'apiKey', 'loca
         Route::delete('/extra/{item}/{itemExtra}', [ItemExtraController::class, 'destroy']);
         Route::get('/extra/{item}/show/{itemExtra}', [ItemExtraController::class, 'show']);
 
+        Route::get('/recipe/{item}', [ItemIngredientController::class, 'index']);
+        Route::post('/recipe/{item}', [ItemIngredientController::class, 'store']);
+        Route::match(['put', 'patch'], '/recipe/{item}/{itemIngredient}', [ItemIngredientController::class, 'update']);
+        Route::delete('/recipe/{item}/{itemIngredient}', [ItemIngredientController::class, 'destroy']);
+
         Route::get('/addon/{item}', [ItemAddonController::class, 'index']);
         Route::post('/addon/{item}', [ItemAddonController::class, 'store']);
         Route::delete('/addon/{item}/{itemAddon}', [ItemAddonController::class, 'destroy']);
@@ -639,7 +648,28 @@ Route::prefix('admin')->name('admin.')->middleware(['installed', 'apiKey', 'loca
 
     Route::prefix('profit-loss')->name('profit-loss.')->group(function () {
         Route::get('/', [ProfitLossController::class, 'index']);
+        Route::get('/export', [ProfitLossController::class, 'export']);
+        Route::get('/pdf', [ProfitLossController::class, 'pdf']);
         Route::delete('/inventory-purchase/{inventoryPurchase}', [ProfitLossController::class, 'destroyPurchase']);
+    });
+
+    Route::prefix('inventory-wastage')->name('inventory-wastage.')->group(function () {
+        Route::get('/', [InventoryWastageController::class, 'index']);
+        Route::get('/items', [InventoryWastageController::class, 'items']);
+        Route::post('/', [InventoryWastageController::class, 'store']);
+        Route::delete('/{inventoryWastage}', [InventoryWastageController::class, 'destroy']);
+    });
+
+    Route::prefix('stock-counts')->name('stock-counts.')->group(function () {
+        Route::get('/', [InventoryCountController::class, 'index']);
+        Route::get('/items', [InventoryCountController::class, 'items']);
+        Route::get('/show/{inventoryCount}', [InventoryCountController::class, 'show']);
+        Route::post('/', [InventoryCountController::class, 'store']);
+    });
+
+    Route::prefix('inventory-report')->name('inventory-report.')->group(function () {
+        Route::get('/', [InventoryReportController::class, 'index']);
+        Route::get('/daily/{inventoryItem}', [InventoryReportController::class, 'daily'])->withTrashed();
     });
 
     Route::prefix('pos')->name('pos.')->group(function () {

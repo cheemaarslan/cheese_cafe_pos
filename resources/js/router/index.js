@@ -10,6 +10,9 @@ import settingRoutes from "./modules/settingRoutes";
 import offerRoutes from "./modules/offerRoutes";
 import itemRoutes from "./modules/itemRoutes";
 import inventoryRoutes from "./modules/inventoryRoutes";
+import inventoryWastageRoutes from "./modules/inventoryWastageRoutes";
+import stockCountRoutes from "./modules/stockCountRoutes";
+import inventoryReportRoutes from "./modules/inventoryReportRoutes";
 import expenseRoutes from "./modules/expenseRoutes";
 import profitLossRoutes from "./modules/profitLossRoutes";
 import couponRoutes from "./modules/couponRoutes";
@@ -83,6 +86,9 @@ export const routes = baseRoutes.concat(
     offerRoutes,
     itemRoutes,
     inventoryRoutes,
+    inventoryWastageRoutes,
+    stockCountRoutes,
+    inventoryReportRoutes,
     expenseRoutes,
     profitLossRoutes,
     pushNotificationRoutes,

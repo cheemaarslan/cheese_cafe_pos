@@ -397,6 +397,7 @@ class OrderService
                 $this->order->save();
 
                 $this->storePosOrderAddress($this->order, $request);
+                $this->inventory()->orderPlaced($this->order);
             });
 
             return $this->order;
@@ -447,6 +448,7 @@ class OrderService
 
                 $order->address()?->delete();
                 $this->storePosOrderAddress($order, $request);
+                $this->inventory()->orderUpdated($order);
             });
 
             $this->order = $order->fresh();
@@ -787,6 +789,7 @@ class OrderService
                     $order->status = $request->status;
                     $order->save();
                     $this->recordStatusHistory($order, $fromStatus, 'customer', $request->reason);
+                    $this->inventory()->statusChanged($order);
 
                     if ($order->user) {
                         $order->user->notify(new OrderStatusUpdated($order));
@@ -823,6 +826,7 @@ class OrderService
                 $order->status = $request->status;
                 $order->save();
                 $this->recordStatusHistory($order, $fromStatus, 'admin', $request->reason);
+                $this->inventory()->statusChanged($order);
             }
 
             return $order;
@@ -860,6 +864,14 @@ class OrderService
             'changed_by_source' => $source,
             'created_at'        => now(),
         ]);
+    }
+
+    /**
+     * Keeps POS orders' recipe ingredients in step with inventory; see OrderInventoryService.
+     */
+    private function inventory(): OrderInventoryService
+    {
+        return app(OrderInventoryService::class);
     }
 
     /**
@@ -953,6 +965,7 @@ class OrderService
     {
         try {
             DB::transaction(function () use ($order) {
+                $this->inventory()->orderDeleting($order);
                 $order->address()?->delete();
                 $order->coupon()?->delete();
                 $order->orderItems()?->delete();

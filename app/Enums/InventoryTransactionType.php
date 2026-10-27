@@ -11,4 +11,5 @@ interface InventoryTransactionType
     const ORDER        = 20;
     const ORDER_UPDATE = 25;
     const ORDER_RETURN = 30;
+    const STOCK_COUNT  = 35;
 }

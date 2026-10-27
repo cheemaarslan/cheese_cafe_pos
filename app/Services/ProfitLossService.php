@@ -51,7 +51,12 @@ class ProfitLossService
                 [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
             }
 
-            $byMonth = $from->diffInDays($to) >= self::DAILY_BREAKDOWN_MAX_DAYS;
+            // Breakdown by day or month as asked, otherwise by the length of the range
+            $byMonth = match ($request->input('group_by')) {
+                'day' => false,
+                'month' => true,
+                default => $from->diffInDays($to) >= self::DAILY_BREAKDOWN_MAX_DAYS,
+            };
             $periodFormat = $byMonth ? 'Y-m' : 'Y-m-d';
 
             $periods = [];
@@ -68,12 +73,16 @@ class ProfitLossService
             }
 
             // Order is branch-scoped (BranchScope), so income is for the user's current branch.
+            // The order filters narrow the income only: expenses aren't tied to orders.
             $incomeRows = Order::query()
                 ->selectRaw('DATE_FORMAT(order_datetime, ?) as period, SUM(total) as amount, COUNT(*) as orders', [
                     $byMonth ? '%Y-%m' : '%Y-%m-%d',
                 ])
                 ->whereIn('status', self::INCOME_ORDER_STATUSES)
                 ->whereBetween('order_datetime', [$from, $to])
+                ->when($request->filled('order_type'), fn ($query) => $query->where('order_type', $request->input('order_type')))
+                ->when($request->filled('source'), fn ($query) => $query->where('source', $request->input('source')))
+                ->when($request->filled('payment_status'), fn ($query) => $query->where('payment_status', $request->input('payment_status')))
                 ->groupBy('period')
                 ->get();
 
@@ -126,7 +135,10 @@ class ProfitLossService
             return [
                 'from_date' => $from->toDateString(),
                 'to_date' => $to->toDateString(),
+                'converted_from_date' => AppLibrary::date($from),
+                'converted_to_date' => AppLibrary::date($to),
                 'group_by' => $byMonth ? 'month' : 'day',
+                'filters' => $this->filters($request),
                 'summary' => ['orders' => array_sum(array_column($periods, 'orders'))] + $this->amounts(
                     array_sum(array_column($periods, 'income')),
                     array_sum(array_column($periods, 'inventory_expense')),
@@ -155,6 +167,25 @@ class ProfitLossService
             Log::error($exception->getMessage());
             throw new Exception(QueryExceptionLibrary::message($exception), 422);
         }
+    }
+
+    /**
+     * The order filters in use, as "label: value" text for exports, e.g. ["Source: POS"].
+     */
+    private function filters(Request $request): array
+    {
+        $filters = [];
+        if ($request->filled('order_type')) {
+            $filters[] = trans('all.label.order_type') . ': ' . trans('orderType.' . $request->input('order_type'));
+        }
+        if ($request->filled('source')) {
+            $filters[] = trans('all.label.source') . ': ' . trans('source.' . $request->input('source'));
+        }
+        if ($request->filled('payment_status')) {
+            $filters[] = trans('all.label.payment_status') . ': ' . trans('payment_status.' . $request->input('payment_status'));
+        }
+
+        return $filters;
     }
 
     private function amounts(float $income, float $inventoryExpense, float $generalExpense): array

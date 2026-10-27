@@ -2,7 +2,7 @@
     <LoadingComponent :props="loading" />
 
     <div class="col-12">
-        <div class="grid grid-cols-1 sm:grid-cols-5 mb-4 sm:mb-0">
+        <div class="grid grid-cols-1 sm:grid-cols-6 mb-4 sm:mb-0">
             <button type="button" @click="handleTab($event, '#information', '.db-tabBtn', '.db-tabDiv', 'active')"
                 class="db-tabBtn !justify-start active">
                 <i class="lab lab-information lab-font-size-16"></i>
@@ -26,6 +26,10 @@
                 @click="handleTab($event, '#addon', '.db-tabBtn', '.db-tabDiv', 'active')"><i
                     class="lab lab-addon lab-font-size-16"></i>
                 {{ $t('label.addon') }}
+            </button>
+            <button type="button" class="db-tabBtn !justify-start" @click="openRecipe($event)">
+                <i class="fa-solid fa-utensils"></i>
+                {{ $t('label.recipe') }}
             </button>
         </div>
         <div class="db-tabDiv active" id="information">
@@ -146,6 +150,9 @@
         <div class="db-tabDiv" id="addon">
             <ItemAddonListComponent :item="parseInt($route.params.id)" />
         </div>
+        <div class="db-tabDiv" id="recipe">
+            <ItemRecipeComponent ref="recipe" :item="parseInt($route.params.id)" />
+        </div>
     </div>
 </template>
 
@@ -159,6 +166,7 @@ import alertService from "../../../services/alertService";
 import ItemVariationListComponent from "./variation/ItemVariationListComponent";
 import ItemExtraListComponent from "./extra/ItemExtraListComponent";
 import ItemAddonListComponent from "./addon/ItemAddonListComponent";
+import ItemRecipeComponent from "./recipe/ItemRecipeComponent";
 
 export default {
     name: "ItemCategoryShowComponent",
@@ -166,7 +174,8 @@ export default {
         ItemVariationListComponent,
         LoadingComponent,
         ItemExtraListComponent,
-        ItemAddonListComponent
+        ItemAddonListComponent,
+        ItemRecipeComponent
     },
     data() {
         return {
@@ -219,6 +228,11 @@ export default {
         },
         handleTab: function (event, targetID, targetButton, targetDiv, activeClass) {
             return appService.handleTab(event, targetID, targetButton, targetDiv, activeClass);
+        },
+        openRecipe: function (event) {
+            this.handleTab(event, '#recipe', '.db-tabBtn', '.db-tabDiv', 'active');
+            // Variations and extras may have been changed in their tabs since the recipe was loaded
+            this.$refs.recipe.list();
         },
         changePreviewImage: function (e) {
             if (e.target.files[0]) {
